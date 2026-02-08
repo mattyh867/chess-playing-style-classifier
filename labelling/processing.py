@@ -141,7 +141,9 @@ class BatchGameProcessor:
         print(f"Saved results to {save_path}")
     
     def _print_statistics(self, df: pd.DataFrame):
+        print("\n" + "="*50)
         print("DATASET STATISTICS")
+        print("="*50)
         
         if 'label' in df.columns:
             print("\nPlaystyle Distribution:")
