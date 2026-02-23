@@ -13,8 +13,29 @@ def load_and_prepare_data(csv_path):
     
     # Separate features and labels
     feature_columns = [
-        'avg_captures_per_move', 'centipawn_loss', 'accuracy',
-        'avg_move_time', 'blunder_rate', 'tactical_sharpness',
+        'checks_per_move',
+        'captures_per_move',
+        'avg_centipawn_loss',
+        'accuracy',
+        'sacrifices',
+        'early_attacks',
+        'prophylactic_moves',
+        'simplifications',
+        'tactical_shots',
+        'blunders',
+        'retreat_moves',
+        'trades_when_losing',
+        'passive_moves',
+        'checks_given',
+        'captures_made',
+        'material_sacrifices',
+        'king_safety_risks',
+        'positional_sacrifices',
+        'defensive_moves',
+        'counterattacks',
+        'best_moves_found',
+        'complex_positions',
+        'total_moves'
     ]
     
     X = df[feature_columns].values
