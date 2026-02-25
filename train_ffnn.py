@@ -238,7 +238,7 @@ def plot_confusion_matrix(cm, label_names, save_path='models/confusion_matrix_ff
     print(f"Confusion matrix saved: {save_path}")
     plt.close()
 
-def save_model(model, history, accuracy, save_dir='models'):
+def save_model(model, history, accuracy, save_dir='models/FFNN'):
     """Save the trained model and metadata"""
     os.makedirs(save_dir, exist_ok=True)
     
