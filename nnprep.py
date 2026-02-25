@@ -10,35 +10,19 @@ import pickle
 def load_and_prepare_data(csv_path):
     print("Loading dataset...")
     df = pd.read_csv(csv_path)
-    
-    # Separate features and labels
-    feature_columns = [
-        'checks_per_move',
-        'captures_per_move',
-        'avg_centipawn_loss',
-        'accuracy',
-        'sacrifices',
-        'early_attacks',
-        'prophylactic_moves',
-        'simplifications',
-        'tactical_shots',
-        'blunders',
-        'retreat_moves',
-        'trades_when_losing',
-        'passive_moves',
-        'checks_given',
-        'captures_made',
-        'material_sacrifices',
-        'king_safety_risks',
-        'positional_sacrifices',
-        'defensive_moves',
-        'counterattacks',
-        'best_moves_found',
-        'complex_positions',
-        'total_moves'
+
+    print(f"Dataset loaded: {len(df)} games")
+    print(f"\nClass distribution:")
+    print(df['label'].value_counts())
+
+    metadata_cols = [
+        'player_name', 'player_elo', 'color', 'game_id', 
+        'date', 'result', 'opening', 'label'
     ]
+
+    feature_cols = [col for col in df.columns if col not in metadata_cols]
     
-    X = df[feature_columns].values
+    X = df[feature_cols].values
     y = df['label'].values
     
     label_mapping = {
@@ -54,7 +38,7 @@ def load_and_prepare_data(csv_path):
     print(f"Dataset shape: {X.shape}")
     print(f"Class distribution: {np.bincount(y)}")
     
-    return X, y, feature_columns, label_mapping
+    return X, y, feature_cols, label_mapping
 
 
 def create_train_val_test_split(X, y, test_size=0.2, val_size=0.1, random_state=42):
@@ -122,7 +106,7 @@ def create_dataloaders(X_train, X_val, X_test, y_train, y_val, y_test, batch_siz
     return train_loader, val_loader, test_loader
 
 
-def save_preprocessing_artifacts(scaler, label_mapping, feature_columns, save_dir='models'):
+def save_preprocessing_artifacts(scaler, label_mapping, feature_cols, save_dir='models'):
     """Save scaler and metadata for later use"""
     import os
     os.makedirs(save_dir, exist_ok=True)
@@ -136,8 +120,8 @@ def save_preprocessing_artifacts(scaler, label_mapping, feature_columns, save_di
     # Save metadata
     metadata = {
         'label_mapping': label_mapping,
-        'feature_columns': feature_columns,
-        'num_features': len(feature_columns)
+        'feature_cols': feature_cols,
+        'num_features': len(feature_cols)
     }
     
     with open(f'{save_dir}/metadata.pkl', 'wb') as f:
@@ -156,7 +140,7 @@ if __name__ == "__main__":
     print("="*60)
     
     # Load data
-    X, y, feature_columns, label_mapping = load_and_prepare_data(CSV_PATH)
+    X, y, feature_cols, label_mapping = load_and_prepare_data(CSV_PATH)
     
     # Create splits
     X_train, X_val, X_test, y_train, y_val, y_test = create_train_val_test_split(
@@ -176,12 +160,12 @@ if __name__ == "__main__":
     )
     
     # Save preprocessing artifacts
-    save_preprocessing_artifacts(scaler, label_mapping, feature_columns)
+    save_preprocessing_artifacts(scaler, label_mapping, feature_cols)
     
     print("\n" + "="*60)
     print("DATA PREPARATION COMPLETE")
     print("="*60)
-    print(f"Number of features: {len(feature_columns)}")
+    print(f"Number of features: {len(feature_cols)}")
     print(f"Number of classes: {len(label_mapping)}")
     print(f"Train batches: {len(train_loader)}")
     print(f"Validation batches: {len(val_loader)}")
