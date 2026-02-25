@@ -12,13 +12,15 @@ SAMPLE_GAME = """
 [Result "1-0"]
 [WhiteElo "2200"]
 [BlackElo "2180"]
-[Opening "Sicilian Defense"]
+[Opening "Philidor Defense"]
 
-1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5 7. Nb3 Be6 
-8. f3 Be7 9. Qd2 O-O 10. O-O-O Nbd7 11. g4 b5 12. g5 b4 13. Ne2 Ne8 
-14. f4 a5 15. f5 Bc4 16. Nbd4 exd4 17. Nxd4 a4 18. Kb1 Qa5 19. Qf2 Rc8 
-20. Bd3 Bxd3 21. Rxd3 Nc5 22. Rg3 Qc7 23. Rf1 Kh8 24. f6 gxf6 25. gxf6 
-Bg5 26. Bxg5 Rg8 27. Qh4 1-0
+1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Bg5 Be7 5. e3 O-O
+6. Nf3 Nbd7 7. Rc1 c6 8. Bd3 dxc4 9. Bxc4 Nd5 10. Bxe7 Qxe7
+11. O-O Nxc3 12. Rxc3 e5 13. dxe5 Nxe5 14. Nxe5 Qxe5
+15. Qc2 Qe7 16. Rfc1 Be6 17. Bd3 Rfd8 18. h3 Rac8
+19. Rc5 Bd5 20. R1c3 Qd6 21. Bf5 Rc7 22. Rg3 g6
+23. Bd3 Rdc8 24. Rf3 Kg7 25. Qc1 Qe7 26. Rfc3 Qd6
+27. Rxd5 cxd5 28. Rxc7 Rxc7 29. Qxc7 Qxc7 30. 1-0
 """
 
 
