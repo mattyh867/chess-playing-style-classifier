@@ -213,6 +213,31 @@ def evaluate_model(model, test_loader, device, label_mapping):
     
     return accuracy, all_predictions, all_labels, cm
 
+def plot_confusion_matrix(cm, label_names, save_path='models/confusion_matrix_ffnn.png'):
+    """Create confusion matrix visualisation"""
+    plt.figure(figsize=(10, 8))
+    
+    # Convert to percentages
+    cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
+    
+    # Add both counts and percentages to each cell
+    annotations = np.empty_like(cm).astype(str)
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            annotations[i, j] = f'{cm[i, j]}\n({cm_percent[i, j]:.1f}%)'
+    
+    sns.heatmap(cm_percent, annot=annotations, fmt='', cmap='Blues', 
+                xticklabels=label_names, yticklabels=label_names,
+                cbar_kws={'label': 'Percentage (%)'})
+    
+    plt.title('Confusion Matrix - FFNN', fontsize=14, fontweight='bold', pad=20)
+    plt.ylabel('True Label', fontsize=12)
+    plt.xlabel('Predicted Label', fontsize=12)
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"Confusion matrix saved: {save_path}")
+    plt.close()
+
 def save_model(model, history, accuracy, save_dir='models'):
     """Save the trained model and metadata"""
     os.makedirs(save_dir, exist_ok=True)
