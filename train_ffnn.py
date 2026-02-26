@@ -114,7 +114,7 @@ def validate(model, val_loader, criterion, device):
 
 
 def train_model(model, train_loader, val_loader, criterion, optimizer, 
-                num_epochs, device, patience=10):
+                num_epochs, device, patience=10, scheduler=None):
     """
     Main training loop with early stopping.
     """
@@ -140,6 +140,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
         
         # Validation phase
         val_loss, val_acc = validate(model, val_loader, criterion, device)
+        scheduler.step(val_loss)
         
         # Save metrics
         history['train_loss'].append(train_loss)
@@ -213,7 +214,7 @@ def evaluate_model(model, test_loader, device, label_mapping):
     
     return accuracy, all_predictions, all_labels, cm
 
-def plot_confusion_matrix(cm, label_names, save_path='models/confusion_matrix_ffnn.png'):
+def plot_confusion_matrix(cm, label_names, save_path='models/FFNN/confusion_matrix_ffnn.png'):
     """Create confusion matrix visualisation"""
     plt.figure(figsize=(10, 8))
     
@@ -321,8 +322,8 @@ def main():
     
     model = ChessStyleFFNN(
         input_size=len(feature_columns),
-        hidden1_size=64,
-        hidden2_size=32,
+        hidden1_size=128,
+        hidden2_size=64,
         num_classes=len(label_mapping),
         dropout_rate=0.3
     ).to(device)
@@ -334,11 +335,12 @@ def main():
     
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, factor=0.5)
     
     # Train
     model, history, best_val_acc = train_model(
         model, train_loader, val_loader, criterion, optimizer,
-        NUM_EPOCHS, device, patience=PATIENCE
+        NUM_EPOCHS, device, patience=PATIENCE, scheduler=scheduler
     )
     
     # Evaluate

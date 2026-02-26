@@ -32,8 +32,7 @@ def load_and_prepare_data(csv_path):
         'balanced': 3
     }
     
-    if y.dtype == 'object':  # If labels are strings
-        y = np.array([label_mapping[label] for label in y])
+    y = np.array([label_mapping[label] if isinstance(label, str) else int(label) for label in y])
     
     print(f"Dataset shape: {X.shape}")
     print(f"Class distribution: {np.bincount(y)}")
@@ -106,7 +105,7 @@ def create_dataloaders(X_train, X_val, X_test, y_train, y_val, y_test, batch_siz
     return train_loader, val_loader, test_loader
 
 
-def save_preprocessing_artifacts(scaler, label_mapping, feature_cols, save_dir='models'):
+def save_preprocessing_artifacts(scaler, label_mapping, feature_cols, save_dir='models/FFNN'):
     """Save scaler and metadata for later use"""
     import os
     os.makedirs(save_dir, exist_ok=True)
