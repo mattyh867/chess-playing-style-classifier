@@ -351,8 +351,6 @@ def main():
     print("Saving results")
     print("="*60)
     
-    plot_training_history(history)
-    
     label_names = list(label_mapping.keys())
     plot_confusion_matrix(cm, label_names)
     
