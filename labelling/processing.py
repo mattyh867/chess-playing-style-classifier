@@ -66,7 +66,7 @@ class BatchGameProcessor:
                     
                     games_processed += 1
 
-                    if games_read % 100 == 0:  # Log every 100 games
+                    if games_read % 10 == 0:  # Log every 10 games
                             print(f"Read {games_read} games, skipped {skipped_rating} due to rating")
                     
                     if games_processed % 10 == 0:
