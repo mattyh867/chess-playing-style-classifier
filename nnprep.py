@@ -135,9 +135,7 @@ if __name__ == "__main__":
     BATCH_SIZE = 32
     RANDOM_STATE = 42
     
-    print("="*60)
-    print("NEURAL NETWORK DATA PREPARATION")
-    print("="*60)
+    print("\nNEURAL NETWORK DATA PREPARATION")
     
     # Load data
     X, y, feature_cols, label_mapping = load_and_prepare_data(CSV_PATH)
@@ -162,9 +160,7 @@ if __name__ == "__main__":
     # Save preprocessing artifacts
     save_preprocessing_artifacts(scaler, label_mapping, feature_cols)
     
-    print("\n" + "="*60)
-    print("DATA PREPARATION COMPLETE")
-    print("="*60)
+    print("\nDATA PREPARATION COMPLETE")
     print(f"Number of features: {len(feature_cols)}")
     print(f"Number of classes: {len(label_mapping)}")
     print(f"Train batches: {len(train_loader)}")
