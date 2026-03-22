@@ -7,10 +7,11 @@ from typing import List, Dict
 
 class BatchGameProcessor:
     
-    def __init__(self, stockfish_path: str, depth: int = 18, min_rating: int = 2000, max_games: int = 5000):
+    def __init__(self, stockfish_path: str, depth: int = 18, min_rating: int = 2000, max_rating: int = None, max_games: int = 5000):
         self.analyzer = ChessGameAnalyzer(stockfish_path, depth)
         self.labeler = PlaystyleLabeler()
         self.min_rating = min_rating
+        self.max_rating = max_rating
         self.max_games = max_games
         
     def process_pgn_file(self, pgn_path: str, output_path: str = None, save_interval: int = 100) -> pd.DataFrame:
@@ -42,7 +43,11 @@ class BatchGameProcessor:
                     white_elo = int(white_elo_str) if white_elo_str != '?' else 0
                     black_elo = int(black_elo_str) if black_elo_str != '?' else 0
 
-                    if white_elo < self.min_rating or black_elo < self.min_rating:
+                    if white_elo <= self.min_rating or black_elo <= self.min_rating:
+                        skipped_rating += 1
+                        continue
+
+                    if self.max_rating and (white_elo >= self.max_rating or black_elo >= self.max_rating):
                         skipped_rating += 1
                         continue
                     
@@ -61,7 +66,7 @@ class BatchGameProcessor:
                     
                     games_processed += 1
 
-                    if games_read % 100 == 0:  # Log every 100 games
+                    if games_read % 10 == 0:  # Log every 10 games
                             print(f"Read {games_read} games, skipped {skipped_rating} due to rating")
                     
                     if games_processed % 10 == 0:
@@ -174,6 +179,7 @@ def main():
     parser.add_argument('--output', default='labeled_games.csv', help='Output CSV path')
     parser.add_argument('--depth', type=int, default=12, help='Analysis depth')
     parser.add_argument('--min-rating', type=int, default=1500, help='Minimum player rating')
+    parser.add_argument('--max-rating', type=int, default=None, help='Maximum player rating')
     parser.add_argument('--max-games', type=int, default=5000, help='Maximum games to process')
     
     args = parser.parse_args()
@@ -182,6 +188,7 @@ def main():
         stockfish_path=args.stockfish,
         depth=args.depth,
         min_rating=args.min_rating,
+        max_rating=args.max_rating,
         max_games=args.max_games
     )
     
