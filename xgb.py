@@ -14,11 +14,9 @@ import joblib
 import gc
 import json
 import os
-from datetime import datetime
 
 try:
     from xgboost import XGBClassifier
-    print("XGBoost imported successfully")
 except ImportError:
     print("XGBoost not installed. Install with: pip install xgboost")
     exit(1)
@@ -28,17 +26,11 @@ gc.enable()
 def clear_memory():
     gc.collect()
 
-CSV_PATH = 'labelling/labeled_dataset_2015.csv'
-RANDOM_STATE = 42
-CLASSES = ['aggressive', 'positional', 'defensive', 'balanced']
-
-print("\nXGBOOST CLASSIFIER TRAINING")
-
 clear_memory()
 
-df = pd.read_csv(CSV_PATH)
+df = pd.read_csv("labelling/labeled_dataset_2015.csv")
 
-print(f"\nDataset loaded: {len(df)} games")
+print(f"Dataset loaded: {len(df)} games")
 print(f"\nClass distribution:")
 print(df['label'].value_counts())
 
@@ -52,17 +44,12 @@ feature_cols = [col for col in df.columns if col not in metadata_cols]
 X = df[feature_cols]
 y = df['label']
 
-print(f"\nFeatures: {len(feature_cols)}")
-
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
     test_size=0.2,
     stratify=y,
-    random_state=RANDOM_STATE
+    random_state=42
 )
-
-print(f"\nTrain set: {len(X_train)} games")
-print(f"Test set: {len(X_test)} games")
 
 clear_memory()
 
@@ -71,15 +58,13 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # XGBoost requires numeric labels
+classes = ['aggressive', 'positional', 'defensive', 'balanced']
 label_encoder = LabelEncoder()
-label_encoder.fit(CLASSES)
+label_encoder.fit(classes)
 y_train_encoded = label_encoder.transform(y_train)
 y_test_encoded = label_encoder.transform(y_test)
 
-print(f"\nLabel encoding: {dict(zip(label_encoder.classes_, label_encoder.transform(label_encoder.classes_)))}")
-
 print("\nInitializing XGBoost model...")
-
 model = XGBClassifier(
     n_estimators=200,
     max_depth=6,
@@ -87,7 +72,7 @@ model = XGBClassifier(
     subsample=0.8,
     colsample_bytree=0.8,
     min_child_weight=1,
-    random_state=RANDOM_STATE,
+    random_state=42,
     n_jobs=-1,
     eval_metric='mlogloss',
     verbosity=1
@@ -100,28 +85,24 @@ model.fit(
     verbose=False
 )
 
-print("Training complete")
-
 clear_memory()
-
-print("\nEVALUATION")
 
 y_pred_encoded = model.predict(X_test_scaled)
 y_pred = label_encoder.inverse_transform(y_pred_encoded)
 
 print("\nCLASSIFICATION REPORT")
-print(classification_report(y_test, y_pred, labels=CLASSES))
+print(classification_report(y_test, y_pred, labels=classes))
 
 print("\nCONFUSION MATRIX")
-cm = confusion_matrix(y_test, y_pred, labels=CLASSES)
+cm = confusion_matrix(y_test, y_pred, labels=classes)
 print(cm)
 
 precision, recall, f1, support = precision_recall_fscore_support(
-    y_test, y_pred, labels=CLASSES
+    y_test, y_pred, labels=classes
 )
 
 metrics_df = pd.DataFrame({
-    'Class': CLASSES,
+    'Class': classes,
     'Precision': precision,
     'Recall': recall,
     'F1-Score': f1,
@@ -130,11 +111,7 @@ metrics_df = pd.DataFrame({
 
 print("\nPER-CLASS METRICS")
 print(metrics_df)
-
-xgb_accuracy = accuracy_score(y_test, y_pred)
-print(f"\nOverall Accuracy: {xgb_accuracy:.4f}")
-
-print("\nFEATURE IMPORTANCE")
+print(f"\nOverall Accuracy: {accuracy_score(y_test, y_pred):.4f}")
 
 feature_importance = pd.DataFrame({
     'feature': feature_cols,
@@ -144,25 +121,6 @@ feature_importance = pd.DataFrame({
 print("\nTOP 15 MOST IMPORTANT FEATURES")
 print(feature_importance.head(15).to_string(index=False))
 
-print(f"  {'XGBoost':<20} {f'{xgb_accuracy*100:.1f}%':>10}")
-
-print("\nSAVING RESULTS")
-
-os.makedirs('models/XGB', exist_ok=True)
-os.makedirs('results', exist_ok=True)
-
-# Save model
-joblib.dump(model, 'models/XGB/xgb_model.pkl')
-joblib.dump(scaler, 'models/XGB/scaler.pkl')
-joblib.dump(feature_cols, 'models/XGB/feature_columns.pkl')
-joblib.dump(label_encoder, 'models/XGB/label_encoder.pkl')
-print("Model saved to models/XGB/")
-
-# Save feature importance
-feature_importance.to_csv('results/feature_importance_xgb.csv', index=False)
-print("Feature importance saved to results/feature_importance_xgb.csv")
-
-# Save confusion matrix plot
 plt.figure(figsize=(10, 8))
 cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
 annotations = np.empty_like(cm).astype(str)
@@ -171,39 +129,35 @@ for i in range(cm.shape[0]):
         annotations[i, j] = f'{cm[i, j]}\n({cm_percent[i, j]:.1f}%)'
 
 sns.heatmap(cm_percent, annot=annotations, fmt='', cmap='Greens',
-            xticklabels=CLASSES, yticklabels=CLASSES,
+            xticklabels=classes, yticklabels=classes,
             cbar_kws={'label': 'Percentage (%)'})
 plt.title('Confusion Matrix - XGBoost', fontsize=14, fontweight='bold', pad=20)
 plt.ylabel('True Label', fontsize=12)
 plt.xlabel('Predicted Label', fontsize=12)
 plt.tight_layout()
-plt.savefig('models/confusion_matrix_xgb.png', dpi=300, bbox_inches='tight')
-print("Confusion matrix saved to models/confusion_matrix_xgb.png")
+os.makedirs('models/XGB', exist_ok=True)
+plt.savefig('models/XGB/confusion_matrix_xgb.png', dpi=300, bbox_inches='tight')
+print("Confusion matrix saved to models/XGB/confusion_matrix_xgb.png")
 plt.close()
 
-# Save evaluation metrics
+joblib.dump(model, 'models/XGB/xgb_model.pkl')
+joblib.dump(scaler, 'models/XGB/scaler.pkl')
+joblib.dump(feature_cols, 'models/XGB/feature_columns.pkl')
+joblib.dump(label_encoder, 'models/XGB/label_encoder.pkl')
+
+os.makedirs('results/XGB', exist_ok=True)
+feature_importance.to_csv('results/XGB/feature_importance_xgb.csv', index=False)
+
 results = {
-    'accuracy': xgb_accuracy,
+    'accuracy': accuracy_score(y_test, y_pred),
     'per_class_metrics': metrics_df.to_dict('records'),
     'confusion_matrix': cm.tolist(),
-    'feature_importance_top15': feature_importance.head(15).to_dict('records'),
-    'hyperparameters': {
-        'n_estimators': 200,
-        'max_depth': 6,
-        'learning_rate': 0.1,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'min_child_weight': 1,
-    }
+    'feature_importance_top15': feature_importance.head(15).to_dict('records')
 }
 
-with open('results/evaluation_metrics_xgb.json', 'w') as f:
+with open('results/XGB/evaluation_metrics_xgb.json', 'w') as f:
     json.dump(results, f, indent=2)
-print("Metrics saved to results/evaluation_metrics_xgb.json")
 
 clear_memory()
 
-print("\nSUMMARY")
-
-print(f"XGBoost Accuracy: {xgb_accuracy*100:.1f}%")
-print(f"Top 3 features: {', '.join(feature_importance.head(3)['feature'].tolist())}")
+print("TRAINING COMPLETE")

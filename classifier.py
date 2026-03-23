@@ -1,5 +1,3 @@
-# rf_classifier.py
-
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -103,11 +101,29 @@ feature_importance = pd.DataFrame({
 print("\nTOP 15 MOST IMPORTANT FEATURES")
 print(feature_importance.head(15).to_string(index=False))
 
-joblib.dump(model, 'models/rf_baseline_model.pkl')
-joblib.dump(scaler, 'models/scaler.pkl')
-joblib.dump(feature_cols, 'models/feature_columns.pkl')
+plt.figure(figsize=(10, 8))
+cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
+annotations = np.empty_like(cm).astype(str)
+for i in range(cm.shape[0]):
+    for j in range(cm.shape[1]):
+        annotations[i, j] = f'{cm[i, j]}\n({cm_percent[i, j]:.1f}%)'
+ 
+sns.heatmap(cm_percent, annot=annotations, fmt='', cmap='Reds',
+            xticklabels=classes, yticklabels=classes,
+            cbar_kws={'label': 'Percentage (%)'})
+plt.title('Confusion Matrix - Random Forest', fontsize=14, fontweight='bold', pad=20)
+plt.ylabel('True Label', fontsize=12)
+plt.xlabel('Predicted Label', fontsize=12)
+plt.tight_layout()
+plt.savefig('models/RF/confusion_matrix_rf.png', dpi=300, bbox_inches='tight')
+print("Confusion matrix saved to models/confusion_matrix_rf.png")
+plt.close()
 
-feature_importance.to_csv('results/feature_importance.csv', index=False)
+joblib.dump(model, 'models/RF/rf_baseline_model.pkl')
+joblib.dump(scaler, 'models/RF/scaler.pkl')
+joblib.dump(feature_cols, 'models/RF/feature_columns.pkl')
+
+feature_importance.to_csv('results/RF/feature_importance_rf.csv', index=False)
 
 results = {
     'accuracy': accuracy_score(y_test, y_pred),
@@ -116,7 +132,7 @@ results = {
     'feature_importance_top15': feature_importance.head(15).to_dict('records')
 }
 
-with open('results/evaluation_metrics.json', 'w') as f:
+with open('results/RF/evaluation_metrics.json', 'w') as f:
     json.dump(results, f, indent=2)
 
 clear_memory()
