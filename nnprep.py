@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import pickle
+import joblib
 
 def load_and_prepare_data(csv_path):
     print("Loading dataset...")
@@ -115,7 +115,7 @@ def save_preprocessing_artifacts(scaler, label_mapping, feature_cols, save_dir='
     
     # Save scaler
     with open(f'{save_dir}/scaler.pkl', 'wb') as f:
-        pickle.dump(scaler, f)
+        joblib.dump(scaler, f'{save_dir}/scaler.pkl')
     
     # Save metadata
     metadata = {
@@ -125,7 +125,7 @@ def save_preprocessing_artifacts(scaler, label_mapping, feature_cols, save_dir='
     }
     
     with open(f'{save_dir}/metadata.pkl', 'wb') as f:
-        pickle.dump(metadata, f)
+        joblib.dump(metadata, f'{save_dir}/metadata.pkl')
     
     print("Preprocessing artifacts saved")
 
