@@ -118,9 +118,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
     """
     Main training loop with early stopping.
     """
-    print("\n" + "="*60)
-    print("Starting training")
-    print("="*60)
+    print("\nStarting training")
     
     history = {
         'train_loss': [],
@@ -157,7 +155,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
             best_val_acc = val_acc
             best_model_state = model.state_dict().copy()
             epochs_no_improve = 0
-            print(f"  -> New best validation accuracy: {best_val_acc:.2f}%")
+            print(f"New best validation accuracy: {best_val_acc:.2f}%")
         else:
             epochs_no_improve += 1
             if epochs_no_improve >= patience:
@@ -168,17 +166,13 @@ def train_model(model, train_loader, val_loader, criterion, optimizer,
     # Restore best model
     model.load_state_dict(best_model_state)
     
-    print("\n" + "="*60)
-    print("Training complete")
-    print("="*60)
+    print("\nTraining complete")
     
     return model, history, best_val_acc
 
 def evaluate_model(model, test_loader, device, label_mapping):
     """Evaluate model on test set and print detailed metrics"""
-    print("\n" + "="*60)
-    print("Evaluating on test set")
-    print("="*60)
+    print("\nEvaluating on test set")
     
     model.eval()
     all_predictions = []
@@ -202,9 +196,7 @@ def evaluate_model(model, test_loader, device, label_mapping):
     
     # Per-class metrics
     label_names = list(label_mapping.keys())
-    print("\n" + "-"*60)
-    print("Per-class metrics:")
-    print("-"*60)
+    print("\nPer-class metrics:")
     print(classification_report(all_labels, all_predictions, 
                                 target_names=label_names, digits=3))
     
@@ -283,18 +275,13 @@ def main():
     PATIENCE = 15
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print("="*60)
-    print("FEEDFORWARD NEURAL NETWORK TRAINING")
-    print("="*60)
+    print("\nFEEDFORWARD NEURAL NETWORK TRAINING")
     print(f"Device: {device}")
     print(f"Batch size: {BATCH_SIZE}")
     print(f"Learning rate: {LEARNING_RATE}")
     print(f"Max epochs: {NUM_EPOCHS}")
     
-    # Load and prepare data
-    print("\n" + "="*60)
-    print("Loading data")
-    print("="*60)
+    print("\nLoading data")
     
     X, y, feature_columns, label_mapping = load_and_prepare_data(CSV_PATH)
     
@@ -315,9 +302,7 @@ def main():
     save_preprocessing_artifacts(scaler, label_mapping, feature_columns)
     
     # Initialize model
-    print("\n" + "="*60)
-    print("Initializing model")
-    print("="*60)
+    print("\nInitializing model")
     
     model = ChessStyleFFNN(
         input_size=len(feature_columns),
@@ -347,9 +332,7 @@ def main():
     )
     
     # Save everything
-    print("\n" + "="*60)
-    print("Saving results")
-    print("="*60)
+    print("\nSaving results")
     
     plot_training_history(history)
     
@@ -358,20 +341,11 @@ def main():
     
     save_model(model, history, test_accuracy)
     
-    print("\n" + "="*60)
-    print("SUMMARY")
-    print("="*60)
+    print("\nSUMMARY")
     print(f"Best validation accuracy: {best_val_acc:.2f}%")
     print(f"Final test accuracy: {test_accuracy*100:.2f}%")
     print(f"Training epochs: {len(history['train_loss'])}")
-    print("\nComparison to Random Forest baseline:")
-    print(f"Random Forest: 83.3%")
     print(f"FFNN: {test_accuracy*100:.2f}%")
-    
-    print("\n" + "="*60)
-    print("Done")
-    print("="*60)
-
 
 if __name__ == "__main__":
     main()
