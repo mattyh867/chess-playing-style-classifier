@@ -18,22 +18,23 @@ BASE_DIR = os.path.join(os.path.dirname(__file__), '..')
 
 SAMPLE_GAME = """
 [Event "Rated Bullet game"]
-[Site "https://lichess.org/9fC5l6Xf"]
-[White "Ukiteru9"]
-[Black "Master_Chief"]
+[Site "https://lichess.org/ulpcm79x"]
+[White "journal"]
+[Black "Kiriush33"]
 [Result "1-0"]
-[UTCDate "2014.12.31"]
-[UTCTime "23:00:37"]
-[WhiteElo "1961"]
-[BlackElo "1618"]
-[WhiteRatingDiff "+4"]
-[BlackRatingDiff "-4"]
-[ECO "A04"]
-[Opening "Zukertort Opening: Kingside Fianchetto"]
-[TimeControl "0+1"]
+[UTCDate "2013.12.31"]
+[UTCTime "23:00:20"]
+[WhiteElo "1691"]
+[BlackElo "1717"]
+[WhiteRatingDiff "+13"]
+[BlackRatingDiff "-12"]
+[ECO "C20"]
+[Opening "King's Pawn Game: Leonardis Variation"]
+[TimeControl "60+0"]
 [Termination "Time forfeit"]
 
-1. Nf3 g6 2. d4 Bg7 3. Bg5 Nc6 4. h4 h6 5. Bd2 e6 6. e4 Nce7 7. e5 Nf6 8. exf6 Bxf6 9. c3 Nc6 10. Bd3 b6 11. Qc2 Rg8 12. Be4 Bb7 13. h5 Na5 14. Bxb7 Nxb7 15. hxg6 Rxg6 16. Na3 Bg5 17. Nxg5 hxg5 18. Rh8+ Ke7 19. Rxd8 Rxd8 20. O-O-O d6 21. Nc4 d5 22. Ne3 Rdg8 23. Ng4 f5 24. Ne5 R6g7 25. Kb1 f4 26. Nc6+ Kd6 27. Nxa7 Na5 28. Nb5+ Kd7 29. b3 c6 30. Na3 1-0"""
+1. e4 e5 2. d3 Nf6 3. Nf3 d5 4. Nc3 Nc6 5. exd5 Nxd5 6. Nxd5 Qxd5 7. c4 Bb4+ 8. Bd2 Bxd2+ 9. Qxd2 Qd7 10. Be2 Qd6 11. O-O Bf5 12. Rfe1 O-O-O 13. b3 f6 14. Qe3 Bxd3 15. Bxd3 Qxd3 16. Qxd3 Rxd3 17. Nh4 Rhd8 18. Nf5 Rd8d7 19. Kh1 Nb4 20. Rec1 Rd3d2 21. a3 Nd3 22. Rcd1 Nxf2+ 23. Kg1 Nxd1 24. h3 Nc3 25. Rf1 Ne4 26. b4 Rd2d1 27. Ne7+ Rxe7 28. Rxd1 Rd7 29. Rxd7 1-0
+"""
 
 
 def analyze_game(stockfish_path, game, color):
