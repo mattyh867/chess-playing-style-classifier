@@ -146,9 +146,7 @@ class BatchGameProcessor:
         print(f"Saved results to {save_path}")
     
     def _print_statistics(self, df: pd.DataFrame):
-        print("\n" + "="*50)
-        print("DATASET STATISTICS")
-        print("="*50)
+        print("\nDATASET STATISTICS")
         
         if 'label' in df.columns:
             print("\nPlaystyle Distribution:")
@@ -166,8 +164,7 @@ class BatchGameProcessor:
             print(f"\nAccuracy Statistics:")
             print(f"Mean CP Loss: {df['avg_centipawn_loss'].mean():.1f}")
             print(f"Mean Accuracy: {df['accuracy'].mean()*100:.1f}%")
-        
-        print("="*50)
+    
 
 
 def main():
