@@ -1,5 +1,3 @@
-# ffnn_classifier.py
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -12,6 +10,7 @@ from sklearn.metrics import (
     accuracy_score,
     precision_recall_fscore_support
 )
+from sklearn.utils.class_weight import compute_class_weight
 import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
@@ -19,6 +18,7 @@ import os
 import json
 import gc
 from datetime import datetime
+
 
 from nnprep import (
     load_and_prepare_data,
@@ -118,7 +118,7 @@ def validate(model, val_loader, criterion, device):
     return val_loss, val_acc
 
 def main():
-    CSV_PATH = 'labelling/labeled_dataset_2015.csv'
+    CSV_PATH = 'labelling/labeled_dataset_2017.csv'
     BATCH_SIZE = 32
     LEARNING_RATE = 0.001
     NUM_EPOCHS = 100
@@ -169,7 +169,9 @@ def main():
     total_params = sum(p.numel() for p in model.parameters())
     print(f"\nTotal parameters: {total_params:,}")
 
-    criterion = nn.CrossEntropyLoss()
+    class_weights = compute_class_weight('balanced', classes=np.unique(y_train), y=y_train)
+    weights_tensor = torch.FloatTensor(class_weights).to(device)
+    criterion = nn.CrossEntropyLoss(weight=weights_tensor)
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     print("\nTraining model...")
@@ -275,11 +277,10 @@ def main():
     plt.ylabel('True Label', fontsize=12)
     plt.xlabel('Predicted Label', fontsize=12)
     plt.tight_layout()
+    os.makedirs('models/FFNN', exist_ok=True)
     plt.savefig('models/FFNN/confusion_matrix_ffnn.png', dpi=300, bbox_inches='tight')
     print("Confusion matrix saved to models/FFNN/confusion_matrix_ffnn.png")
     plt.close()
-
-    os.makedirs('models/FFNN', exist_ok=True)
 
     feature_cols_path = 'models/FFNN/feature_columns.pkl'
     joblib.dump(feature_columns, feature_cols_path)
@@ -320,6 +321,7 @@ def main():
         'confusion_matrix': cm.tolist(),
     }
 
+    os.makedirs('results/FFNN', exist_ok=True)
     with open('results/FFNN/evaluation_metrics_ffnn.json', 'w') as f:
         json.dump(results, f, indent=2)
 
