@@ -44,10 +44,7 @@ venv.bak/
 .idea/
 
 # Data files
-*.pgn
 *.csv
-*.json
-!requirements.txt
 
 # Logs
 *.log

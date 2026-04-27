@@ -1,0 +1,121 @@
+{
+  "accuracy": 0.9695,
+  "per_class_metrics": [
+    {
+      "Class": "aggressive",
+      "Precision": 0.9876619370758791,
+      "Recall": 0.9738442822384428,
+      "F1-Score": 0.9807044410413476,
+      "Support": 1644
+    },
+    {
+      "Class": "positional",
+      "Precision": 0.9777365491651205,
+      "Recall": 0.975925925925926,
+      "F1-Score": 0.9768303985171455,
+      "Support": 1080
+    },
+    {
+      "Class": "defensive",
+      "Precision": 0.9353574926542605,
+      "Recall": 0.954045954045954,
+      "F1-Score": 0.9446092977250248,
+      "Support": 1001
+    },
+    {
+      "Class": "balanced",
+      "Precision": 0.9571428571428572,
+      "Recall": 0.9745454545454545,
+      "F1-Score": 0.9657657657657658,
+      "Support": 275
+    }
+  ],
+  "confusion_matrix": [
+    [
+      1601,
+      8,
+      35,
+      0
+    ],
+    [
+      1,
+      1054,
+      24,
+      1
+    ],
+    [
+      19,
+      16,
+      955,
+      11
+    ],
+    [
+      0,
+      0,
+      7,
+      268
+    ]
+  ],
+  "feature_importance_top15": [
+    {
+      "feature": "counterattacks",
+      "importance": 0.1443711668252945
+    },
+    {
+      "feature": "positional_sacrifices",
+      "importance": 0.14337939023971558
+    },
+    {
+      "feature": "prophylactic_moves",
+      "importance": 0.09568512439727783
+    },
+    {
+      "feature": "captures_per_move",
+      "importance": 0.07568028569221497
+    },
+    {
+      "feature": "early_attacks",
+      "importance": 0.05744319036602974
+    },
+    {
+      "feature": "material_sacrifices",
+      "importance": 0.050431933254003525
+    },
+    {
+      "feature": "defensive_moves",
+      "importance": 0.04398602992296219
+    },
+    {
+      "feature": "retreat_moves",
+      "importance": 0.04395394027233124
+    },
+    {
+      "feature": "blunders",
+      "importance": 0.04386010393500328
+    },
+    {
+      "feature": "trades_when_losing",
+      "importance": 0.040935441851615906
+    },
+    {
+      "feature": "sacrifices",
+      "importance": 0.040302008390426636
+    },
+    {
+      "feature": "checks_per_move",
+      "importance": 0.038209687918424606
+    },
+    {
+      "feature": "total_moves",
+      "importance": 0.030965177342295647
+    },
+    {
+      "feature": "accuracy",
+      "importance": 0.03073802962899208
+    },
+    {
+      "feature": "simplifications",
+      "importance": 0.025803787633776665
+    }
+  ]
+}

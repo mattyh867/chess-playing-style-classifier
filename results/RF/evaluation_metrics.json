@@ -1,0 +1,121 @@
+{
+  "accuracy": 0.9115,
+  "per_class_metrics": [
+    {
+      "Class": "aggressive",
+      "Precision": 0.9266547406082289,
+      "Recall": 0.9452554744525548,
+      "F1-Score": 0.935862691960253,
+      "Support": 1644
+    },
+    {
+      "Class": "positional",
+      "Precision": 0.9172154280338665,
+      "Recall": 0.9027777777777778,
+      "F1-Score": 0.9099393373775082,
+      "Support": 1080
+    },
+    {
+      "Class": "defensive",
+      "Precision": 0.8753738783649053,
+      "Recall": 0.8771228771228772,
+      "F1-Score": 0.8762475049900199,
+      "Support": 1001
+    },
+    {
+      "Class": "balanced",
+      "Precision": 0.9299610894941635,
+      "Recall": 0.8690909090909091,
+      "F1-Score": 0.8984962406015038,
+      "Support": 275
+    }
+  ],
+  "confusion_matrix": [
+    [
+      1554,
+      34,
+      56,
+      0
+    ],
+    [
+      52,
+      975,
+      51,
+      2
+    ],
+    [
+      61,
+      46,
+      878,
+      16
+    ],
+    [
+      10,
+      8,
+      18,
+      239
+    ]
+  ],
+  "feature_importance_top15": [
+    {
+      "feature": "captures_per_move",
+      "importance": 0.13548030390455054
+    },
+    {
+      "feature": "prophylactic_moves",
+      "importance": 0.12213265309811283
+    },
+    {
+      "feature": "positional_sacrifices",
+      "importance": 0.07498979257361521
+    },
+    {
+      "feature": "retreat_moves",
+      "importance": 0.06284892680142172
+    },
+    {
+      "feature": "trades_when_losing",
+      "importance": 0.055191708232410534
+    },
+    {
+      "feature": "checks_per_move",
+      "importance": 0.05211113752207518
+    },
+    {
+      "feature": "counterattacks",
+      "importance": 0.05026666337872804
+    },
+    {
+      "feature": "accuracy",
+      "importance": 0.049475403280707764
+    },
+    {
+      "feature": "blunders",
+      "importance": 0.04793757823340658
+    },
+    {
+      "feature": "total_moves",
+      "importance": 0.04604633832357691
+    },
+    {
+      "feature": "defensive_moves",
+      "importance": 0.04221602035983332
+    },
+    {
+      "feature": "early_attacks",
+      "importance": 0.0403388587320603
+    },
+    {
+      "feature": "avg_centipawn_loss",
+      "importance": 0.03567305629467777
+    },
+    {
+      "feature": "simplifications",
+      "importance": 0.03180923641137244
+    },
+    {
+      "feature": "best_moves_found",
+      "importance": 0.03052441639259547
+    }
+  ]
+}
