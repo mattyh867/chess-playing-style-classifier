@@ -54,11 +54,19 @@ def main():
         random_state=42
     )
 
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train,
+        test_size=0.1,
+        stratify=y_train,
+        random_state=42
+    )
+
     clear_memory()
 
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
+    X_val_scaled = scaler.transform(X_val)
 
     # XGBoost requires numeric labels
     classes = ['aggressive', 'positional', 'defensive', 'balanced']
@@ -66,6 +74,7 @@ def main():
     label_encoder.fit(classes)
     y_train_encoded = label_encoder.transform(y_train)
     y_test_encoded = label_encoder.transform(y_test)
+    y_val_encoded = label_encoder.transform(y_val)
 
     sample_weights = compute_sample_weight('balanced', y_train_encoded)
 
@@ -86,7 +95,7 @@ def main():
     print("\nTraining model...")
     model.fit(
         X_train_scaled, y_train_encoded,
-        eval_set=[(X_test_scaled, y_test_encoded)],
+        eval_set=[(X_val_scaled, y_val_encoded)],
         verbose=False,
         sample_weight=sample_weights,
     )

@@ -56,14 +56,7 @@ venv.bak/
 stockfish*
 !stockfish_path.txt
 
-# Output
-output/
-results/
 labeled_data/
-
-# Models
-models/
-*.pkl
 
 # Testing
 .pytest_cache/
