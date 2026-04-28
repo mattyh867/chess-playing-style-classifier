@@ -57,14 +57,29 @@
       #result {
         display: none;
       }
-      #result h2 {
+
+      .model-block {
+        margin-bottom: 32px;
+      }
+
+      .model-block h3 {
+        font-size: 14px;
+        color: #666;
+        font-weight: normal;
+        margin-bottom: 4px;
+      }
+
+      .model-block h2 {
         text-transform: capitalize;
         margin-bottom: 8px;
+        font-size: 1.2rem;
       }
-      #result p {
-        margin-bottom: 20px;
+
+      .model-block p {
+        margin-bottom: 12px;
         line-height: 1.6;
         color: #333;
+        font-size: 14px;
       }
 
       table {
@@ -103,12 +118,14 @@
       }
 
       #meta {
-        margin-top: 12px;
+        margin-top: 4px;
+        margin-bottom: 24px;
         font-size: 13px;
         color: #888;
       }
+
       #reset-btn {
-        margin-top: 16px;
+        margin-top: 8px;
         font-size: 13px;
       }
     </style>
@@ -142,27 +159,14 @@
     <hr />
 
     <div id="result">
-      <h2 id="r-style"></h2>
-      <p id="r-desc"></p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Style</th>
-            <th>Confidence</th>
-            <th>%</th>
-          </tr>
-        </thead>
-        <tbody id="r-rows"></tbody>
-      </table>
-
       <div id="meta"></div>
-      <br />
+      <div id="model-blocks"></div>
       <button id="reset-btn" onclick="reset()">Try another game</button>
     </div>
 
     <script>
       const ORDER = ["aggressive", "positional", "defensive", "balanced"];
+      const MODEL_ORDER = ["Random Forest", "FFNN", "XGBoost"];
 
       const DESCRIPTIONS = {
         aggressive:
@@ -211,28 +215,49 @@
       }
 
       function showResult(data) {
-        document.getElementById("r-style").textContent = data.style;
-        document.getElementById("r-desc").textContent =
-          DESCRIPTIONS[data.style] || "";
         document.getElementById("meta").textContent =
           data.total_moves + " moves analysed";
 
-        const tbody = document.getElementById("r-rows");
-        tbody.innerHTML = "";
+        const container = document.getElementById("model-blocks");
+        container.innerHTML = "";
 
-        const highest = Math.max(
-          ...ORDER.map((k) => data.probabilities[k] || 0),
-        );
+        MODEL_ORDER.forEach((modelName) => {
+          const res = data.results[modelName];
+          if (!res) return;
 
-        ORDER.forEach((cls) => {
-          const pct = data.probabilities[cls] || 0;
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-        <td style="text-transform:capitalize">${cls}</td>
-        <td><div class="bar-bg"><div class="bar ${pct === highest ? "best" : ""}" style="width:${pct}%"></div></div></td>
-        <td>${pct}%</td>
-      `;
-          tbody.appendChild(tr);
+          const highest = Math.max(
+            ...ORDER.map((k) => res.probabilities[k] || 0),
+          );
+
+          let rows = "";
+          ORDER.forEach((cls) => {
+            const pct = res.probabilities[cls] || 0;
+            rows += `
+              <tr>
+                <td style="text-transform:capitalize">${cls}</td>
+                <td><div class="bar-bg"><div class="bar ${pct === highest ? "best" : ""}" style="width:${pct}%"></div></div></td>
+                <td>${pct}%</td>
+              </tr>`;
+          });
+
+          const block = document.createElement("div");
+          block.className = "model-block";
+          block.innerHTML = `
+            <h3>${modelName}</h3>
+            <h2>${res.style}</h2>
+            <p>${DESCRIPTIONS[res.style] || ""}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Style</th>
+                  <th>Confidence</th>
+                  <th>%</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>`;
+
+          container.appendChild(block);
         });
 
         document.getElementById("result").style.display = "block";
