@@ -1,8 +1,11 @@
 [phases.setup]
-nixPkgs = ["python313", "stockfish", "python313Packages.pip"]
+nixPkgs = ["python311", "stockfish"]
 
 [phases.install]
-cmds = ["pip3 install -r requirements.txt"]
+cmds = [
+  "python -m venv --copies /opt/venv",
+  ". /opt/venv/bin/activate && pip install -r requirements.txt"
+]
 
 [start]
-cmd = "gunicorn app:app"
+cmd = ". /opt/venv/bin/activate && python app.py"
