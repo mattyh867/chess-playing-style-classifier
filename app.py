@@ -6,13 +6,14 @@ import chess
 import chess.pgn
 import torch
 from flask import Flask, request, jsonify, render_template
+import shutil
 
 from labelling.chess_analyzer import ChessGameAnalyzer, PlaystyleLabeler
 from ffnn import ChessStyleFFNN
 
 app = Flask(__name__)
 
-STOCKFISH_PATH = os.environ.get('STOCKFISH_PATH', '/usr/games/stockfish')
+STOCKFISH_PATH = os.environ.get('STOCKFISH_PATH') or shutil.which('stockfish') or '/usr/games/stockfish'
 ANALYSIS_DEPTH = int(os.environ.get('ANALYSIS_DEPTH', 8))
 
 RF_MODEL_PATH = 'models/RF/rf_baseline_model.pkl'
@@ -185,4 +186,4 @@ def predict():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=port)
