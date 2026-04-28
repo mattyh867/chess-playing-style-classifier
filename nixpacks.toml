@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python313", "stockfish"]
+nixPkgs = ["python313", "stockfish", "python313Packages.pip"]
 
 [phases.install]
 cmds = ["pip3 install -r requirements.txt"]
