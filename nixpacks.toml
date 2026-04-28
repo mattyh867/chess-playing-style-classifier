@@ -1,2 +1,8 @@
 [phases.setup]
-nixPkgs = ["stockfish"]
+nixPkgs = ["python311", "stockfish"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "gunicorn app:app"
