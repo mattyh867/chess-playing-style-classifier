@@ -30,8 +30,8 @@ FFNN_MODEL_PATH    = 'models/FFNN/ffnn_model.pth'
 FFNN_SCALER_PATH   = 'models/FFNN/scaler.pkl'
 FFNN_FEATURES_PATH = 'models/FFNN/feature_columns.pkl'
 
-HIGH_ELO_CSV       = 'evaluation/high_elo_features.csv'
-LOW_ELO_CSV        = 'evaluation/low_elo_features.csv'
+HIGH_ELO_CSV       = 'tests/eval_high.csv'
+LOW_ELO_CSV        = 'tests/eval_low.csv'
 
 CLASSES = ['aggressive', 'positional', 'defensive', 'balanced']
 
