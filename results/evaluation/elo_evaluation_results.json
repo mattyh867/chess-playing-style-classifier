@@ -1,0 +1,54 @@
+{
+  "High Elo (2000+)": {
+    "n_samples": 1000,
+    "elo_range": [
+      1601,
+      2449
+    ],
+    "model_agreement_pct": 86.7,
+    "Random Forest": {
+      "aggressive": 40.3,
+      "positional": 29.3,
+      "defensive": 24.5,
+      "balanced": 5.9
+    },
+    "FFNN": {
+      "aggressive": 37.6,
+      "positional": 29.8,
+      "defensive": 23.6,
+      "balanced": 9.0
+    },
+    "XGBoost": {
+      "aggressive": 38.9,
+      "positional": 29.6,
+      "defensive": 24.9,
+      "balanced": 6.6
+    }
+  },
+  "Low Elo (under 1400)": {
+    "n_samples": 1000,
+    "elo_range": [
+      787,
+      1399
+    ],
+    "model_agreement_pct": 85.9,
+    "Random Forest": {
+      "aggressive": 59.7,
+      "positional": 13.2,
+      "defensive": 21.6,
+      "balanced": 5.5
+    },
+    "FFNN": {
+      "aggressive": 54.3,
+      "positional": 17.0,
+      "defensive": 21.5,
+      "balanced": 7.2
+    },
+    "XGBoost": {
+      "aggressive": 55.1,
+      "positional": 15.4,
+      "defensive": 24.2,
+      "balanced": 5.3
+    }
+  }
+}
