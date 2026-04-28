@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Playstyle Classifier</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 640px;
+        margin: 40px auto;
+        padding: 0 16px;
+        font-size: 15px;
+      }
+
+      h1 {
+        margin-bottom: 6px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 160px;
+        font-family: monospace;
+        font-size: 13px;
+        margin-top: 8px;
+        padding: 6px;
+        border: 1px solid #999;
+        resize: vertical;
+      }
+
+      .controls {
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      select,
+      button {
+        font-size: 14px;
+        padding: 5px 10px;
+      }
+
+      #status,
+      #error {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      #error {
+        color: red;
+      }
+
+      hr {
+        margin: 28px 0;
+      }
+
+      #result {
+        display: none;
+      }
+      #result h2 {
+        text-transform: capitalize;
+        margin-bottom: 8px;
+      }
+      #result p {
+        margin-bottom: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      td,
+      th {
+        text-align: left;
+        padding: 5px 8px;
+        font-size: 14px;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        font-weight: normal;
+        color: #666;
+        font-size: 13px;
+      }
+      td:last-child,
+      th:last-child {
+        text-align: right;
+        width: 50px;
+      }
+
+      .bar-bg {
+        background: #eee;
+        height: 6px;
+        width: 100%;
+      }
+      .bar {
+        height: 6px;
+        background: #555;
+      }
+      .bar.best {
+        background: green;
+      }
+
+      #meta {
+        margin-top: 12px;
+        font-size: 13px;
+        color: #888;
+      }
+      #reset-btn {
+        margin-top: 16px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chess Playing Style Classifier</h1>
+    <p>Paste a PGN below and select which colour you were playing as.</p>
+
+    <label for="pgn">PGN:</label>
+    <textarea
+      id="pgn"
+      placeholder='[Event "Casual Game"]
+[White "You"]
+[Black "Opponent"]
+
+1. e4 e5 2. Nf3 ...'
+    ></textarea>
+
+    <div class="controls">
+      <label for="color">Colour:</label>
+      <select id="color">
+        <option value="white">White</option>
+        <option value="black">Black</option>
+      </select>
+      <button onclick="analyse()">Analyse</button>
+    </div>
+
+    <div id="status" style="display: none">Analysing, please wait...</div>
+    <div id="error" style="display: none"></div>
+
+    <hr />
+
+    <div id="result">
+      <h2 id="r-style"></h2>
+      <p id="r-desc"></p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Style</th>
+            <th>Confidence</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody id="r-rows"></tbody>
+      </table>
+
+      <div id="meta"></div>
+      <br />
+      <button id="reset-btn" onclick="reset()">Try another game</button>
+    </div>
+
+    <script>
+      const ORDER = ["aggressive", "positional", "defensive", "balanced"];
+
+      const DESCRIPTIONS = {
+        aggressive:
+          "Your games tend to be sharp and attacking. You go for early pressure, piece sacrifices, and keeping your opponent on the back foot.",
+        positional:
+          "You focus more on long-term factors like piece placement and pawn structure rather than going for immediate tactics.",
+        defensive:
+          "You tend to sit back, neutralise threats, and look to counter rather than attack first.",
+        balanced:
+          "No strong lean toward any one style. You seem to adjust depending on the position.",
+      };
+
+      async function analyse() {
+        const pgn = document.getElementById("pgn").value.trim();
+        const color = document.getElementById("color").value;
+
+        if (!pgn) {
+          showErr("Please paste a PGN first.");
+          return;
+        }
+
+        setLoading(true);
+        hideErr();
+        document.getElementById("result").style.display = "none";
+
+        try {
+          const res = await fetch("/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pgn, color }),
+          });
+          const data = await res.json();
+
+          if (!res.ok || data.error) {
+            showErr(data.error || "Something went wrong.");
+            setLoading(false);
+            return;
+          }
+
+          showResult(data);
+        } catch (e) {
+          showErr("Could not reach the server.");
+        }
+
+        setLoading(false);
+      }
+
+      function showResult(data) {
+        document.getElementById("r-style").textContent = data.style;
+        document.getElementById("r-desc").textContent =
+          DESCRIPTIONS[data.style] || "";
+        document.getElementById("meta").textContent =
+          data.total_moves + " moves analysed";
+
+        const tbody = document.getElementById("r-rows");
+        tbody.innerHTML = "";
+
+        const highest = Math.max(
+          ...ORDER.map((k) => data.probabilities[k] || 0),
+        );
+
+        ORDER.forEach((cls) => {
+          const pct = data.probabilities[cls] || 0;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+        <td style="text-transform:capitalize">${cls}</td>
+        <td><div class="bar-bg"><div class="bar ${pct === highest ? "best" : ""}" style="width:${pct}%"></div></div></td>
+        <td>${pct}%</td>
+      `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById("result").style.display = "block";
+      }
+
+      function reset() {
+        document.getElementById("pgn").value = "";
+        document.getElementById("result").style.display = "none";
+        hideErr();
+      }
+
+      function setLoading(on) {
+        document.getElementById("status").style.display = on ? "block" : "none";
+        document.querySelector(".controls button").disabled = on;
+      }
+
+      function showErr(msg) {
+        const el = document.getElementById("error");
+        el.textContent = msg;
+        el.style.display = "block";
+      }
+
+      function hideErr() {
+        document.getElementById("error").style.display = "none";
+      }
+    </script>
+  </body>
+</html>
