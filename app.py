@@ -7,7 +7,7 @@ import chess.pgn
 import torch
 from flask import Flask, request, jsonify, render_template
 
-from chess_analyzer import ChessGameAnalyzer, PlaystyleLabeler
+from labelling.chess_analyzer import ChessGameAnalyzer, PlaystyleLabeler
 from ffnn import ChessStyleFFNN
 
 app = Flask(__name__)
