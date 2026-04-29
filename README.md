@@ -25,4 +25,3 @@ Stockfish must be installed separately and the path configured in `chess_analyze
 ## Data
 
 Training data sourced from the Lichess Open Database (2015). 
-Dataset CSV files are not included in this repository.
