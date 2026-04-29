@@ -3,6 +3,9 @@
 A machine learning system that classifies chess playing styles 
 (aggressive, positional, defensive, balanced) from game data.
 
+Deployed at:
+https://chess-playing-style-classifier-production-ee70.up.railway.app/
+
 ## Scripts
 
 - `processing.py` / `chess_analyzer.py` — data pipeline and Stockfish feature extraction
