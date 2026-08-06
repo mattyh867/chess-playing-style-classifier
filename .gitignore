@@ -69,3 +69,4 @@ htmlcov/
 ~WRL*.tmp
 *.bak
 *.backup
+.claude

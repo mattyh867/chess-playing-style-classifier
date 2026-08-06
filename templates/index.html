@@ -5,163 +5,468 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chess Playstyle Classifier</title>
     <style>
+      :root {
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --border: #e3e6ea;
+        --text: #14181d;
+        --muted: #6b7480;
+        --faint: #9aa3ad;
+        --accent: #2f6f4f;
+        --accent-soft: #e7f1eb;
+        --track: #eceef1;
+        --bar: #b3bac2;
+        --danger: #b3261e;
+        --danger-soft: #fdeceb;
+        --shadow: 0 1px 2px rgba(16, 24, 40, 0.05),
+          0 8px 24px -12px rgba(16, 24, 40, 0.14);
+        --radius: 14px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f1216;
+          --surface: #171b21;
+          --border: #262c34;
+          --text: #e8ecf1;
+          --muted: #98a2ae;
+          --faint: #6b7480;
+          --accent: #5fd39b;
+          --accent-soft: #17301f;
+          --track: #232931;
+          --bar: #47505b;
+          --danger: #ff8b82;
+          --danger-soft: #2b1715;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.4),
+            0 8px 24px -12px rgba(0, 0, 0, 0.6);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: sans-serif;
-        max-width: 640px;
-        margin: 40px auto;
-        padding: 0 16px;
+        font-family:
+          ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+          Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 48px 20px 80px;
         font-size: 15px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      header {
+        margin-bottom: 28px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 11.5px;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+
+      .eyebrow .piece {
+        font-size: 15px;
+        line-height: 1;
       }
 
       h1 {
-        margin-bottom: 6px;
+        font-size: 30px;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        margin: 0 0 8px;
+        font-weight: 650;
+      }
+
+      .lede {
+        margin: 0;
+        color: var(--muted);
+        max-width: 52ch;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+
+      label {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
       }
 
       textarea {
         width: 100%;
-        height: 160px;
-        font-family: monospace;
+        height: 190px;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+          monospace;
         font-size: 13px;
-        margin-top: 8px;
-        padding: 6px;
-        border: 1px solid #999;
+        line-height: 1.6;
+        padding: 12px 14px;
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
         resize: vertical;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      textarea::placeholder {
+        color: var(--faint);
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
       }
 
       .controls {
-        margin-top: 8px;
+        margin-top: 16px;
         display: flex;
-        gap: 8px;
+        gap: 10px;
         align-items: center;
+        flex-wrap: wrap;
       }
 
-      select,
-      button {
+      .controls label {
+        margin-bottom: 0;
+      }
+
+      select {
+        font: inherit;
         font-size: 14px;
-        padding: 5px 10px;
+        padding: 9px 12px;
+        color: var(--text);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        cursor: pointer;
+      }
+
+      select:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      button {
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 9px 20px;
+        border-radius: 9px;
+        border: 1px solid transparent;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        transition: opacity 0.15s ease, transform 0.06s ease;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        button {
+          color: #0f1216;
+        }
+      }
+
+      button:hover:not(:disabled) {
+        opacity: 0.88;
+      }
+
+      button:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      button.secondary {
+        background: transparent;
+        color: var(--muted);
+        border-color: var(--border);
       }
 
       #status,
       #error {
-        margin-top: 10px;
+        margin-top: 16px;
         font-size: 14px;
-      }
-      #error {
-        color: red;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--muted);
       }
 
-      hr {
-        margin: 28px 0;
+      #error {
+        color: var(--danger);
+        background: var(--danger-soft);
+        border-color: transparent;
+      }
+
+      .spinner {
+        width: 14px;
+        height: 14px;
+        flex: none;
+        border: 2px solid var(--track);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .spinner {
+          animation-duration: 2s;
+        }
       }
 
       #result {
         display: none;
+        margin-top: 36px;
+      }
+
+      .results-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 12px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .results-head h2 {
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 0;
+        font-weight: 600;
+      }
+
+      #meta {
+        font-size: 13px;
+        color: var(--faint);
+        font-variant-numeric: tabular-nums;
       }
 
       .model-block {
-        margin-bottom: 32px;
+        margin-bottom: 16px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
       }
 
       .model-block h3 {
-        font-size: 14px;
-        color: #666;
-        font-weight: normal;
-        margin-bottom: 4px;
+        font-size: 11.5px;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--faint);
+        font-weight: 600;
+        margin: 0 0 10px;
       }
 
       .model-block h2 {
         text-transform: capitalize;
-        margin-bottom: 8px;
-        font-size: 1.2rem;
+        margin: 0 0 10px;
+        font-size: 22px;
+        letter-spacing: -0.015em;
+        font-weight: 650;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex: none;
       }
 
       .model-block p {
-        margin-bottom: 12px;
+        margin: 0 0 18px;
         line-height: 1.6;
-        color: #333;
+        color: var(--muted);
         font-size: 14px;
+        max-width: 58ch;
       }
 
       table {
         width: 100%;
         border-collapse: collapse;
       }
-      td,
+
       th {
+        font-weight: 600;
+        color: var(--faint);
+        font-size: 11px;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
         text-align: left;
-        padding: 5px 8px;
+        padding: 0 10px 8px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      td {
+        text-align: left;
+        padding: 11px 10px 11px 0;
         font-size: 14px;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--border);
+        color: var(--muted);
       }
-      th {
-        font-weight: normal;
-        color: #666;
-        font-size: 13px;
+
+      tr:last-child td {
+        border-bottom: none;
+        padding-bottom: 0;
       }
+
+      td:first-child,
+      th:first-child {
+        width: 108px;
+      }
+
       td:last-child,
       th:last-child {
         text-align: right;
-        width: 50px;
+        width: 58px;
+        padding-right: 0;
+        font-variant-numeric: tabular-nums;
+      }
+
+      tr.is-best td {
+        color: var(--text);
+        font-weight: 600;
       }
 
       .bar-bg {
-        background: #eee;
-        height: 6px;
+        background: var(--track);
+        height: 7px;
         width: 100%;
-      }
-      .bar {
-        height: 6px;
-        background: #555;
-      }
-      .bar.best {
-        background: green;
+        border-radius: 99px;
+        overflow: hidden;
       }
 
-      #meta {
-        margin-top: 4px;
-        margin-bottom: 24px;
-        font-size: 13px;
-        color: #888;
+      .bar {
+        height: 7px;
+        background: var(--bar);
+        border-radius: 99px;
+        transform-origin: left center;
+        animation: grow 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+      }
+
+      .bar.best {
+        background: var(--accent);
+      }
+
+      @keyframes grow {
+        from {
+          transform: scaleX(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .bar {
+          animation: none;
+        }
       }
 
       #reset-btn {
         margin-top: 8px;
-        font-size: 13px;
+      }
+
+      @media (max-width: 520px) {
+        body {
+          padding: 32px 16px 64px;
+        }
+        h1 {
+          font-size: 25px;
+        }
+        td:first-child,
+        th:first-child {
+          width: 84px;
+        }
+        .controls button {
+          margin-left: auto;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Chess Playing Style Classifier</h1>
-    <p>Paste a PGN below and select which colour you were playing as.</p>
+    <header>
+      <div class="eyebrow"><span class="piece">&#9822;</span> Playstyle analysis</div>
+      <h1>Chess Playing Style Classifier</h1>
+      <p class="lede">
+        Paste a PGN below and select which colour you were playing as.
+      </p>
+    </header>
 
-    <label for="pgn">PGN:</label>
-    <textarea
-      id="pgn"
-      placeholder='[Event "Casual Game"]
+    <div class="card">
+      <label for="pgn">PGN</label>
+      <textarea
+        id="pgn"
+        placeholder='[Event "Casual Game"]
 [White "You"]
 [Black "Opponent"]
 
 1. e4 e5 2. Nf3 ...'
-    ></textarea>
+      ></textarea>
 
-    <div class="controls">
-      <label for="color">Colour:</label>
-      <select id="color">
-        <option value="white">White</option>
-        <option value="black">Black</option>
-      </select>
-      <button onclick="analyse()">Analyse</button>
+      <div class="controls">
+        <label for="color">Colour</label>
+        <select id="color">
+          <option value="white">White</option>
+          <option value="black">Black</option>
+        </select>
+        <button onclick="analyse()">Analyse</button>
+      </div>
+
+      <div id="status" style="display: none">
+        <span class="spinner"></span> Analysing, please wait...
+      </div>
+      <div id="error" style="display: none"></div>
     </div>
 
-    <div id="status" style="display: none">Analysing, please wait...</div>
-    <div id="error" style="display: none"></div>
-
-    <hr />
-
     <div id="result">
-      <div id="meta"></div>
+      <div class="results-head">
+        <h2>Predictions</h2>
+        <div id="meta"></div>
+      </div>
       <div id="model-blocks"></div>
-      <button id="reset-btn" onclick="reset()">Try another game</button>
+      <button id="reset-btn" class="secondary" onclick="reset()">
+        Try another game
+      </button>
     </div>
 
     <script>
@@ -221,7 +526,7 @@
         const container = document.getElementById("model-blocks");
         container.innerHTML = "";
 
-        MODEL_ORDER.forEach((modelName) => {
+        MODEL_ORDER.forEach((modelName, i) => {
           const res = data.results[modelName];
           if (!res) return;
 
@@ -230,12 +535,14 @@
           );
 
           let rows = "";
-          ORDER.forEach((cls) => {
+          ORDER.forEach((cls, j) => {
             const pct = res.probabilities[cls] || 0;
+            const best = pct === highest;
+            const delay = (i * 0.08 + j * 0.05).toFixed(2);
             rows += `
-              <tr>
+              <tr class="${best ? "is-best" : ""}">
                 <td style="text-transform:capitalize">${cls}</td>
-                <td><div class="bar-bg"><div class="bar ${pct === highest ? "best" : ""}" style="width:${pct}%"></div></div></td>
+                <td><div class="bar-bg"><div class="bar ${best ? "best" : ""}" style="width:${pct}%;animation-delay:${delay}s"></div></div></td>
                 <td>${pct}%</td>
               </tr>`;
           });
@@ -244,7 +551,7 @@
           block.className = "model-block";
           block.innerHTML = `
             <h3>${modelName}</h3>
-            <h2>${res.style}</h2>
+            <h2><span class="dot"></span>${res.style}</h2>
             <p>${DESCRIPTIONS[res.style] || ""}</p>
             <table>
               <thead>
@@ -267,17 +574,18 @@
         document.getElementById("pgn").value = "";
         document.getElementById("result").style.display = "none";
         hideErr();
+        document.getElementById("pgn").focus();
       }
 
       function setLoading(on) {
-        document.getElementById("status").style.display = on ? "block" : "none";
+        document.getElementById("status").style.display = on ? "flex" : "none";
         document.querySelector(".controls button").disabled = on;
       }
 
       function showErr(msg) {
         const el = document.getElementById("error");
         el.textContent = msg;
-        el.style.display = "block";
+        el.style.display = "flex";
       }
 
       function hideErr() {
