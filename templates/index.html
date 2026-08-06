@@ -534,36 +534,63 @@
             ...ORDER.map((k) => res.probabilities[k] || 0),
           );
 
-          let rows = "";
+          // Built with textContent rather than innerHTML so no server-supplied
+          // value is ever parsed as markup.
+          const block = document.createElement("div");
+          block.className = "model-block";
+
+          const h3 = document.createElement("h3");
+          h3.textContent = modelName;
+
+          const h2 = document.createElement("h2");
+          const dot = document.createElement("span");
+          dot.className = "dot";
+          h2.append(dot, document.createTextNode(res.style));
+
+          const desc = document.createElement("p");
+          desc.textContent = DESCRIPTIONS[res.style] || "";
+
+          const table = document.createElement("table");
+          const thead = document.createElement("thead");
+          const headRow = document.createElement("tr");
+          ["Style", "Confidence", "%"].forEach((label) => {
+            const th = document.createElement("th");
+            th.textContent = label;
+            headRow.appendChild(th);
+          });
+          thead.appendChild(headRow);
+
+          const tbody = document.createElement("tbody");
           ORDER.forEach((cls, j) => {
             const pct = res.probabilities[cls] || 0;
             const best = pct === highest;
-            const delay = (i * 0.08 + j * 0.05).toFixed(2);
-            rows += `
-              <tr class="${best ? "is-best" : ""}">
-                <td style="text-transform:capitalize">${cls}</td>
-                <td><div class="bar-bg"><div class="bar ${best ? "best" : ""}" style="width:${pct}%;animation-delay:${delay}s"></div></div></td>
-                <td>${pct}%</td>
-              </tr>`;
+
+            const tr = document.createElement("tr");
+            if (best) tr.className = "is-best";
+
+            const nameCell = document.createElement("td");
+            nameCell.style.textTransform = "capitalize";
+            nameCell.textContent = cls;
+
+            const barCell = document.createElement("td");
+            const track = document.createElement("div");
+            track.className = "bar-bg";
+            const fill = document.createElement("div");
+            fill.className = best ? "bar best" : "bar";
+            fill.style.width = pct + "%";
+            fill.style.animationDelay = (i * 0.08 + j * 0.05).toFixed(2) + "s";
+            track.appendChild(fill);
+            barCell.appendChild(track);
+
+            const pctCell = document.createElement("td");
+            pctCell.textContent = pct + "%";
+
+            tr.append(nameCell, barCell, pctCell);
+            tbody.appendChild(tr);
           });
 
-          const block = document.createElement("div");
-          block.className = "model-block";
-          block.innerHTML = `
-            <h3>${modelName}</h3>
-            <h2><span class="dot"></span>${res.style}</h2>
-            <p>${DESCRIPTIONS[res.style] || ""}</p>
-            <table>
-              <thead>
-                <tr>
-                  <th>Style</th>
-                  <th>Confidence</th>
-                  <th>%</th>
-                </tr>
-              </thead>
-              <tbody>${rows}</tbody>
-            </table>`;
-
+          table.append(thead, tbody);
+          block.append(h3, h2, desc, table);
           container.appendChild(block);
         });
 

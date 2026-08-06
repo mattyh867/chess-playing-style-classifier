@@ -1,3 +1,4 @@
+import os
 import chess
 import chess.pgn
 import chess.engine
@@ -5,6 +6,11 @@ from dataclasses import dataclass
 from typing import Dict, List, Tuple
 import numpy as np
 from pathlib import Path
+
+# Engine resource defaults. Kept small so a single web request cannot claim the
+# whole container; training/evaluation callers pass larger values explicitly.
+DEFAULT_ENGINE_HASH_MB = int(os.environ.get('ENGINE_HASH_MB', 128))
+DEFAULT_ENGINE_THREADS = int(os.environ.get('ENGINE_THREADS', 1))
 
 
 @dataclass
@@ -44,18 +50,46 @@ class GameFeatures:
 class ChessGameAnalyzer:
     """Analyzes chess games using Stockfish"""
     
-    def __init__(self, stockfish_path: str, depth: int = 18):
+    def __init__(self, stockfish_path: str, depth: int = 18,
+                 hash_mb: int = None, threads: int = None):
         """Initialize analyzer with Stockfish engine"""
         self.engine = chess.engine.SimpleEngine.popen_uci(stockfish_path)
-        self.engine.configure({"Hash": 4096})
-        self.engine.configure({"Threads": 8}) 
+        self.engine.configure({
+            "Hash": DEFAULT_ENGINE_HASH_MB if hash_mb is None else hash_mb,
+            "Threads": DEFAULT_ENGINE_THREADS if threads is None else threads,
+        })
         self.depth = depth
-        
+
+    def close(self):
+        """Terminate the engine subprocess. Safe to call more than once."""
+        engine = getattr(self, 'engine', None)
+        if engine is None:
+            return
+        self.engine = None
+        try:
+            engine.quit()
+        except Exception:
+            # Engine may already be dead (e.g. worker timeout killed it).
+            try:
+                engine.close()
+            except Exception:
+                pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
+        return False
+
     def __del__(self):
-        """Clean up engine"""
-        if hasattr(self, 'engine'):
-            self.engine.quit()
-    
+        """Backstop cleanup; must never raise during interpreter shutdown."""
+        try:
+            self.close()
+        except Exception:
+            pass
+
+
     def analyze_game(self, game: chess.pgn.Game, color: chess.Color) -> GameFeatures:
         """Analyze a game and extract features for one player"""
         features = GameFeatures()

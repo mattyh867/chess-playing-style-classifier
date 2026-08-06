@@ -7,8 +7,11 @@ from typing import List, Dict
 
 class BatchGameProcessor:
     
-    def __init__(self, stockfish_path: str, depth: int = 18, min_rating: int = 2000, max_rating: int = None, max_games: int = 5000):
-        self.analyzer = ChessGameAnalyzer(stockfish_path, depth)
+    def __init__(self, stockfish_path: str, depth: int = 18, min_rating: int = 2000, max_rating: int = None, max_games: int = 5000,
+                 hash_mb: int = 4096, threads: int = 8):
+        # Offline batch labelling runs on a dev machine, so it keeps the large
+        # engine settings; the web app relies on the much smaller defaults.
+        self.analyzer = ChessGameAnalyzer(stockfish_path, depth, hash_mb=hash_mb, threads=threads)
         self.labeler = PlaystyleLabeler()
         self.min_rating = min_rating
         self.max_rating = max_rating

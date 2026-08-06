@@ -124,7 +124,7 @@ def main():
         num_classes=4,
         dropout_rate=arch['dropout_rate']
     )
-    model.load_state_dict(torch.load(os.path.join(BASE_DIR, 'models/FFNN/ffnn_model.pth'), map_location='cpu'))
+    model.load_state_dict(torch.load(os.path.join(BASE_DIR, 'models/FFNN/ffnn_model.pth'), map_location='cpu', weights_only=True))
     model.eval()
     
     scaler_path = os.path.join(BASE_DIR, 'models/FFNN/scaler.pkl')

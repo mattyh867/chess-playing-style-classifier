@@ -8,4 +8,4 @@ cmds = [
 ]
 
 [start]
-cmd = ". /opt/venv/bin/activate && gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 1"
+cmd = ". /opt/venv/bin/activate && gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --preload --workers 2 --threads 2"

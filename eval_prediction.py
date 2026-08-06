@@ -68,7 +68,9 @@ def load_ffnn():
         num_classes=4,
         dropout_rate=0.3
     ).to(device)
-    model.load_state_dict(torch.load(FFNN_MODEL_PATH, map_location=device))
+    model.load_state_dict(
+        torch.load(FFNN_MODEL_PATH, map_location=device, weights_only=True)
+    )
     model.eval()
     return model, scaler, feature_cols, device
 
