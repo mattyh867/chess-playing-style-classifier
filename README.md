@@ -124,12 +124,44 @@ Production (as deployed):
 gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --preload --workers 2 --threads 2
 ```
 
+### Example game
+
+A 29-move Lichess bullet game to paste into the demo (or the `--pgn` flag of the test
+scripts). This is the same game the test scripts fall back to when no `--pgn` is given:
+
+```
+[Event "Rated Bullet game"]
+[Site "https://lichess.org/ulpcm79x"]
+[White "journal"]
+[Black "Kiriush33"]
+[Result "1-0"]
+[UTCDate "2013.12.31"]
+[UTCTime "23:00:20"]
+[WhiteElo "1691"]
+[BlackElo "1717"]
+[WhiteRatingDiff "+13"]
+[BlackRatingDiff "-12"]
+[ECO "C20"]
+[Opening "King's Pawn Game: Leonardis Variation"]
+[TimeControl "60+0"]
+[Termination "Time forfeit"]
+
+1. e4 e5 2. d3 Nf6 3. Nf3 d5 4. Nc3 Nc6 5. exd5 Nxd5 6. Nxd5 Qxd5 7. c4 Bb4+ 8. Bd2
+Bxd2+ 9. Qxd2 Qd7 10. Be2 Qd6 11. O-O Bf5 12. Rfe1 O-O-O 13. b3 f6 14. Qe3 Bxd3 15. Bxd3
+Qxd3 16. Qxd3 Rxd3 17. Nh4 Rhd8 18. Nf5 Rd8d7 19. Kh1 Nb4 20. Rec1 Rd3d2 21. a3 Nd3
+22. Rcd1 Nxf2+ 23. Kg1 Nxd1 24. h3 Nc3 25. Rf1 Ne4 26. b4 Rd2d1 27. Ne7+ Rxe7 28. Rxd1
+Rd7 29. Rxd7 1-0
+```
+
+The tags are optional — the move text alone is enough. Each colour is analysed
+separately, so the same PGN gives a different prediction for `white` and `black`.
+
 ### API
 
 ```bash
 curl -X POST http://localhost:5000/predict \
   -H 'Content-Type: application/json' \
-  -d '{"pgn": "[Event \"...\"] 1. e4 e5 ...", "color": "white"}'
+  -d '{"pgn": "1. e4 e5 2. d3 Nf6 3. Nf3 d5 4. Nc3 Nc6 5. exd5 Nxd5 ...", "color": "white"}'
 ```
 
 ```json
@@ -213,8 +245,8 @@ works without retraining.
 
 ## Tests
 
-Each test script runs a sample game through the full extract-and-predict path for one
-model:
+Each test script runs the [example game](#example-game) above through the full
+extract-and-predict path for one model:
 
 ```bash
 python tests/test_rf.py $(which stockfish)
